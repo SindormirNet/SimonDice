@@ -1,0 +1,4 @@
+SimonDice
+=========
+
+Simon Dice 
