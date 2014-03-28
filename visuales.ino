@@ -1,5 +1,4 @@
 
-
 unsigned int intro() {
   byte cuenta_botones;
   byte i;
@@ -14,7 +13,6 @@ unsigned int intro() {
   delay(2000);
   
   //Mostramos puntuacion maxima
-  
   lcd.setCursor(13, 1);
   lcd.print(EEPROM.read(DIR_PUNTUACION_EEPROM));  
 
@@ -39,8 +37,7 @@ unsigned int intro() {
       if ((semilla * i) % 16 == 0)  //<- Musica chula!!!
         tone(altavoz, notas[i], 100);
 
-      
-      delay(200); //Was 100
+      delay(200); 
       if ((semilla * (i+1)) % 32 == 0)
         digitalWrite(cadenaLeds[i], LOW);
     }

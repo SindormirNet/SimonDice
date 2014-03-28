@@ -53,6 +53,7 @@ void setup() {
   pinMode(altavoz, OUTPUT);
 
   lcd.createChar(0, sindormir);
+  delay(100);
   lcd.begin(16, 2);
 
   //Musica inicial
@@ -71,7 +72,7 @@ void loop() {
   if (serie==0) {
     num_errores = 0;
     semilla=intro(); //Obtiene una semilla en funcion del tiempo que ha estado funcionando la intro
-    genera_serie(randomize(semilla));
+    genera_serie(randomize(semilla)); //Genera 128 rondas
     
     lcd.setCursor(0, 1);
     lcd.print(" Ronda: 1              ");
@@ -102,6 +103,7 @@ void loop() {
     fin(serie);
     serie=0;
   }
+  
   delay(500);
   lcd.setCursor(11, 1);
   lcd.print("     ");

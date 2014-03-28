@@ -1,14 +1,14 @@
 void juego(byte ronda) {
   
   for(byte i=0; i<ronda; i++) {
-     digitalWrite(serieLeds[i],HIGH);          //Enciende el led
-     tone(altavoz, serieNotas[i],500);
+     digitalWrite(serieLeds[i],HIGH);       //Enciende el led correspondiente
+     tone(altavoz, serieNotas[i],500);      //Toca la nota correspondiente
      delay(500);
-     digitalWrite(serieLeds[i],LOW);           //Apaga el led
+     digitalWrite(serieLeds[i],LOW);        //Apaga el led
      delay(200);                            //Espera un poco a que se ilumine el siguiente
   }
   
-  for(byte i=0; i<5; i++)
+  for(byte i=0; i<5; i++)                    //Señalizamos que se ha terminado la secuencia
     flash();
 }
 
@@ -16,10 +16,10 @@ boolean check_puls(byte ronda) {
   byte m,n;
   
   for (m = 0; m < ronda; m++) {
-    while ((digitalRead(0) == HIGH) && (digitalRead(1) == HIGH) && (digitalRead(2) == HIGH) && (digitalRead(3) == HIGH)) //Esperando que se pulse //syv pullup
+    while ((digitalRead(0) == HIGH) && (digitalRead(1) == HIGH) && (digitalRead(2) == HIGH) && (digitalRead(3) == HIGH)) //Esperando que se pulse un boton
       delay(10);
     for (n = 0; n < 4; n++){
-      if (digitalRead(cadenaPuls[n]) == LOW) {//Al pulsar, se ilumina el led y suena la nota //syv pullup
+      if (digitalRead(cadenaPuls[n]) == LOW) {  //Al pulsar, se ilumina el led y suena la nota
         digitalWrite(cadenaLeds[n], HIGH);
         tone(altavoz, notas[n],500);
         delay(500);
@@ -28,6 +28,7 @@ boolean check_puls(byte ronda) {
         delay(10);
       } 
     }
+    
     if (seriePuls[m] != serieLeds[m]) {        //Si hemos pulsado el correcto
       secuencia_erronea();
       return 1;
