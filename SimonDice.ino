@@ -1,6 +1,7 @@
 #include <EEPROM.h>
 #include <LiquidCrystal.h>
 
+#define GND 13
 #define LONGITUD_SECUENCIA 128
 #define NUM_MAX_ERRORES 3
 #define DIR_PUNTUACION_EEPROM 100
@@ -35,12 +36,18 @@ LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
 void setup() {
   byte i;
   
+  //Activar esta linea la primera vez que se cargue el juego en un Arduino
   //EEPROM.write(DIR_PUNTUACION_EEPROM, 0);
 
   for (i = 0; i < 4; i++)
-    pinMode(cadenaPuls[i], INPUT);
+    pinMode(cadenaPuls[i], INPUT_PULLUP); //syv pullup
   for (i = 0; i < 4; i++)
     pinMode(cadenaLeds[i], OUTPUT);
+
+
+  //Ñapa para conseguir una tierra mas para los pulsadores
+  pinMode(GND, OUTPUT);
+  digitalWrite(GND,LOW);
 
   //Establece el pin al que esta conectado el zumbador como salida
   pinMode(altavoz, OUTPUT);
@@ -63,14 +70,15 @@ void loop() {
 
   if (serie==0) {
     num_errores = 0;
-    semilla=intro();
-    randomserie(randomize(semilla));
+    semilla=intro(); //Obtiene una semilla en funcion del tiempo que ha estado funcionando la intro
+    genera_serie(randomize(semilla));
+    
     lcd.setCursor(0, 1);
     lcd.print(" Ronda: 1              ");
     serie=1;
   }
 
-  juego(semilla, serie);
+  juego(serie);
 
   resultado = check_puls(serie);
 

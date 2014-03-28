@@ -1,4 +1,4 @@
-void juego(unsigned int init, byte ronda) {
+void juego(byte ronda) {
   
   for(byte i=0; i<ronda; i++) {
      digitalWrite(serieLeds[i],HIGH);          //Enciende el led
@@ -16,10 +16,10 @@ boolean check_puls(byte ronda) {
   byte m,n;
   
   for (m = 0; m < ronda; m++) {
-    while ((digitalRead(0) == LOW) && (digitalRead(1) == LOW) && (digitalRead(2) == LOW) && (digitalRead(3) == LOW)) //Esperando que se pulse
+    while ((digitalRead(0) == HIGH) && (digitalRead(1) == HIGH) && (digitalRead(2) == HIGH) && (digitalRead(3) == HIGH)) //Esperando que se pulse //syv pullup
       delay(10);
     for (n = 0; n < 4; n++){
-      if (digitalRead(cadenaPuls[n]) == HIGH) {//Al pulsar, se ilumina el led y suena la nota
+      if (digitalRead(cadenaPuls[n]) == LOW) {//Al pulsar, se ilumina el led y suena la nota //syv pullup
         digitalWrite(cadenaLeds[n], HIGH);
         tone(altavoz, notas[n],500);
         delay(500);
@@ -43,6 +43,7 @@ void fin(byte ronda) {
 
   lcd.setCursor(0,1);
   lcd.print(" Fin de partida ");  
+  delay(2000);
   
   for (byte i=0; i<4; i++) {
     tone(altavoz,notas_fin[i],500+(150*i));
@@ -52,6 +53,12 @@ void fin(byte ronda) {
   //Compromos si ha sido la puntuacion mas alta y la guardamos en eeprom
   if (ronda > EEPROM.read(DIR_PUNTUACION_EEPROM))
     EEPROM.write(DIR_PUNTUACION_EEPROM, ronda);
+    
+  lcd.clear();
+  lcd.setCursor(0,0);
+  lcd.print("Puntuacion final");     
+  lcd.setCursor(7,1);
+  lcd.print(ronda);
   
   delay(3000);
 }

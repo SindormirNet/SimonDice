@@ -22,9 +22,10 @@ unsigned int intro() {
     cuenta_botones = 0;
 
     for (i = 0; i < 4; i++) {
-      digitalWrite(cadenaLeds[i], HIGH); //Encendemos el LED de la secuencia
+      if ((semilla*(i+1)) % 32 == 0)
+        digitalWrite(cadenaLeds[i], HIGH); //Encendemos el LED de la secuencia
 
-      if (digitalRead(cadenaPuls[i])) {
+      if (digitalRead(cadenaPuls[i])==LOW) { //syv pullup
         lcd.setCursor(i * 3, 1);
         lcd.print("J");
         lcd.print(i + 1);
@@ -35,12 +36,13 @@ unsigned int intro() {
         lcd.print("  ");
       }
 
-      if ((semilla * i) % 16 == 0) { //<- Musica chula!!!
+      if ((semilla * i) % 16 == 0)  //<- Musica chula!!!
         tone(altavoz, notas[i], 100);
-      }
+
       
-      delay(100);
-      digitalWrite(cadenaLeds[i], LOW);
+      delay(200); //Was 100
+      if ((semilla * (i+1)) % 32 == 0)
+        digitalWrite(cadenaLeds[i], LOW);
     }
     semilla++; //Esto cambia la semilla para el generador de numeros aleatorios
   } while (cuenta_botones < 4);
