@@ -5,7 +5,6 @@ unsigned int intro() {
   unsigned int semilla=0;
   
   //Logotipo inicial
-  digitalWrite(10,HIGH); //Activamos la retroiluminacin del display
   lcd.clear();
   lcd.print("Sindormir.net ");
   lcd.write(byte(0));
@@ -35,7 +34,7 @@ unsigned int intro() {
       }
 
       if ((semilla * i) % 16 == 0)  //<- Musica chula!!!
-        tone(altavoz, notas[i], 100);
+        tone(ALTAVOZ, notas[i], 100);
 
       delay(200); 
       if ((semilla * (i+1)) % 32 == 0)
@@ -49,7 +48,7 @@ unsigned int intro() {
   lcd.print(" Comenzamos !!!");
   for (i = 0; i < 4; i++) {
     flash();
-    tone(altavoz, 1000, 400);
+    tone(ALTAVOZ, 1000, 400);
     delay(500);
   }
   
@@ -62,7 +61,7 @@ void secuencia_erronea() {
   lcd.setCursor(13,1);
   lcd.print("NO!");
   delay(100);
-  tone(altavoz,notas_fin[0],1000);
+  tone(ALTAVOZ,notas_fin[0],1000);
   delay(1000);
   lcd.setCursor(13,1);
   lcd.print("   ");

@@ -1,25 +1,25 @@
 #include <EEPROM.h>
 #include <LiquidCrystal.h>
 
+#define LCD_BACKLIGHT 10
 #define GND 13
-#define LONGITUD_SECUENCIA 128
+#define ALTAVOZ 15
+
+#define LONGITUD_SECUENCIA 128                // Define la cantidad de rondas que tendra el juego
 #define NUM_MAX_ERRORES 3
 #define DIR_PUNTUACION_EEPROM 100
 
-//Pines reservados por el display:
-// 4,5,6,7,8,9 -> Display
-// 10 -> Control backlight
+byte cadenaLeds[] = {16, 17, 18, 19};          // cadena con los pins a los que se  conectan los leds. Deben ser consecutivos
+byte cadenaPuls[] = {0, 1, 2, 3};              // cadena con los pins a los que se conectan los pulsadores. Deben ser consecutivos
 
-int cadenaLeds[] = {16, 17, 18, 19};          // cadena con los pins a los que se  conectan los leds
-int cadenaPuls[] = {0, 1, 2, 3};              // cadena con los pins a los que se conectan los pulsadores
-int altavoz = 15;                                // variable con el pin al que se conecta el altavoz
+short signed int offset_pulsadores_leds = cadenaLeds[0]-cadenaPuls[0];
 
-int notas[] = {957, 850, 759, 716};           // cadena con las frecuencias de las notas
-int notas_fin[] = {200, 150, 120, 80};        // cadena con las frecuencias de las notas de fin de juego
+unsigned int notas[] = {957, 850, 759, 716};           // cadena con las frecuencias de las notas de cada jugador
+unsigned int notas_fin[] = {200, 150, 120, 80};        // cadena con las frecuencias de las notas de fin de juego
 
-int serieLeds[LONGITUD_SECUENCIA];
-int seriePuls[LONGITUD_SECUENCIA];
-int serieNotas[LONGITUD_SECUENCIA];
+byte serieLeds[LONGITUD_SECUENCIA];
+byte seriePuls[LONGITUD_SECUENCIA];
+byte serieNotas[LONGITUD_SECUENCIA];
 
 byte sindormir[8] = {
   B00000,
@@ -40,17 +40,20 @@ void setup() {
   //EEPROM.write(DIR_PUNTUACION_EEPROM, 0);
 
   for (i = 0; i < 4; i++)
-    pinMode(cadenaPuls[i], INPUT_PULLUP); //syv pullup
+    pinMode(cadenaPuls[i], INPUT_PULLUP);
   for (i = 0; i < 4; i++)
     pinMode(cadenaLeds[i], OUTPUT);
-
 
   //Ñapa para conseguir una tierra mas para los pulsadores
   pinMode(GND, OUTPUT);
   digitalWrite(GND,LOW);
 
   //Establece el pin al que esta conectado el zumbador como salida
-  pinMode(altavoz, OUTPUT);
+  pinMode(ALTAVOZ, OUTPUT);
+  
+  //Activamos la retroiluminacin del display
+  pinMode(LCD_BACKLIGHT, OUTPUT);
+  digitalWrite(LCD_BACKLIGHT,HIGH); 
 
   lcd.createChar(0, sindormir);
   delay(100);
@@ -58,19 +61,17 @@ void setup() {
 
   //Musica inicial
   for (i = 0; i < 4; i++) {
-    tone(altavoz, 1000, 100);
+    tone(ALTAVOZ, 1000, 100);
     delay(130);
   }
 }
 
 void loop() {
-  static byte num_errores = 0;
   static byte serie = 0;   //Ronda por la que vamos
   boolean resultado;
   unsigned int semilla;
 
   if (serie==0) {
-    num_errores = 0;
     semilla=intro(); //Obtiene una semilla en funcion del tiempo que ha estado funcionando la intro
     genera_serie(randomize(semilla)); //Genera 128 rondas
     
@@ -79,30 +80,11 @@ void loop() {
     serie=1;
   }
 
-  juego(serie);
+  presenta_secuencia(serie);
 
-  resultado = check_puls(serie);
-
-  num_errores += resultado;
-
-  if (num_errores < 3 && !resultado) {
-    serie++;
-    lcd.setCursor(8, 1);
-    lcd.print(serie);
-
-    //Mostramos que se ha introducido bien la serie
-    lcd.setCursor(11, 1);
-    lcd.print("Yeah!");
-
-    num_errores = 0;
-    for (byte i = 0; i < 5; i++)
-      flash();
-  }
-
-  if (num_errores >= NUM_MAX_ERRORES){
-    fin(serie);
-    serie=0;
-  }
+  resultado = comprueba_secuencia(serie);
+  
+  serie = evalua_resultado(serie, resultado);
   
   delay(500);
   lcd.setCursor(11, 1);
